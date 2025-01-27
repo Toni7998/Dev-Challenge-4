@@ -17,6 +17,14 @@
         <li><strong>Curso:</strong> {{ $reservation['course'] }}</li>
         <li><strong>Teléfono:</strong> {{ $reservation['phone'] }}</li>
     </ul>
+
+    <p>Si no puedes asistir, puedes cancelar tu reserva haciendo clic en el siguiente enlace:</p>
+    <p>
+        <a href="{{ $cancelUrl }}" style="color: #f33; text-decoration: underline;">
+            Cancelar mi reserva
+        </a>
+    </p>
+
     <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
     <p>Saludos,<br>El equipo de {{ config('app.name') }}</p>
 </body>

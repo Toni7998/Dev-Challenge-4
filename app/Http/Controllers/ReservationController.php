@@ -138,19 +138,26 @@ class ReservationController extends Controller
             return response()->json(['message' => 'Error al procesar la reserva'], 500);
         }
     }
-
-    public function cancel($id)
+    public function cancel($uuid)
     {
-        $reservation = Reservation::find($id);
+        // Buscar la reserva por UUID
+        $reservation = Reservation::where('uuid', $uuid)->first();
 
+        // Verificar si la reserva existe
         if (!$reservation) {
-            return view('reservation_cancelled', ['error' => 'No s\'ha trobat la reserva especificada.']);
+            return view('reservation_cancelled', [
+                'error' => 'No s\'ha trobat la reserva especificada.',
+            ]);
         }
 
         // Eliminar la reserva
         $reservation->delete();
 
-        return view('reservation_cancelled', ['success' => 'La reserva s\'ha anul·lat correctament.']);
+        // Retornar una vista de confirmación
+        return view('reservation_cancelled', [
+            'success' => 'La reserva s\'ha anul·lat correctament.',
+        ]);
     }
+
 
 }

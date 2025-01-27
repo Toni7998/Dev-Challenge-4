@@ -1,20 +1,22 @@
 <!DOCTYPE html>
-<html lang="ca">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva Anul·lada</title>
+    <title>Reserva Cancelada</title>
+    <link href="{{ asset('css/calendar.css') }}" rel="stylesheet">
 </head>
 
 <body>
-    @if (isset($success))
-        <h1>Reserva anul·lada</h1>
-        <p>{{ $success }}</p>
-    @elseif (isset($error))
-        <h1>Error</h1>
-        <p>{{ $error }}</p>
-    @endif
+    <div style="text-align: center; padding: 20px;">
+        @if (isset($success))
+            <h1 style="color: green;">{{ $success }}</h1>
+        @elseif (isset($error))
+            <h1 style="color: red;">{{ $error }}</h1>
+        @endif
+        <p>Gracias por informarnos. ¡Esperamos verte en otra ocasión!</p>
+    </div>
 </body>
 
 </html>

@@ -11,4 +11,14 @@ class Reservation extends Model
 
     // Campos que se pueden asignar masivamente
     protected $fillable = ['date', 'name', 'email', 'phone', 'course', 'hour'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($reservation) {
+            $reservation->uuid = (string) \Illuminate\Support\Str::uuid();
+        });
+    }
+
 }
