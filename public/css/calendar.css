@@ -144,7 +144,6 @@ input:focus {
     background-color: rgb(170, 170, 12); /* Puedes usar cualquier color para los días parcialmente reservados */
 }
 
-
 /* Reservation Form */
 #bookingForm {
     background: #ecf0f1;

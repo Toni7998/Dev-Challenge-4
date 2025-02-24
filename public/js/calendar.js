@@ -212,7 +212,6 @@ function updateCalendar() {
     }
 }
 
-
 updateCalendar(); // Inicializar el calendario al cargar
 
 function selectDate(date, reservedHours) {
@@ -233,14 +232,18 @@ function selectDate(date, reservedHours) {
     timeSlot.innerHTML = ''; // Limpiamos las opciones anteriores
 
     availableHours.forEach(hour => {
-        // Si la hora está reservada, no se muestra en las opciones
-        if (reservedHours.includes(hour)) {
-            return;
-        }
-
+        // Si la hora está reservada, no la mostramos en las opciones, pero mostramos visualmente
         const option = document.createElement('option');
         option.value = hour;
-        option.textContent = hour;
+
+        if (reservedHours.includes(hour)) {
+            option.textContent = hour + " (Reservado)";
+            option.disabled = true; // No permite seleccionar esta hora
+            option.style.color = 'gray'; // Hacer que se vea diferente
+        } else {
+            option.textContent = hour;
+        }
+
         timeSlot.appendChild(option);
     });
 
