@@ -2,7 +2,7 @@ const calendar = document.getElementById('calendar');
 const currentMonth = document.getElementById('currentMonth');
 const prevMonthButton = document.getElementById('prevMonth');
 const nextMonthButton = document.getElementById('nextMonth');
-const reservationForm = document.getElementById('reservationForm');
+const reservationForm = document.getElementById('bookingForm');
 const selectedDateSpan = document.getElementById('selectedDate');
 let selectedDate = null;
 let reservations = [];
@@ -10,6 +10,29 @@ let today = new Date();
 let currentYear = today.getFullYear();
 let currentMonthIndex = today.getMonth();
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+// Modal functions
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const modalMessage = document.getElementById('modalMessage');
+const modalActionButton = document.getElementById('modalActionButton');
+const closeButton = document.querySelector('.close-button');
+
+function showModal(title, message, callback = null) {
+    modalTitle.textContent = title;
+    modalMessage.textContent = message;
+    modal.classList.remove('hidden');
+
+    const closeModal = () => {
+        modal.classList.add('hidden');
+        if (callback) callback();
+    };
+
+    modalActionButton.onclick = closeModal;
+
+    // Elimina cualquier otro evento que cierre el modal, como hacer clic fuera del modal
+    window.onclick = null;
+}
 
 
 async function loadReservations() {
@@ -64,14 +87,14 @@ async function saveReservation() {
     const time = document.getElementById('timeSlot').value.trim();
 
     if (!name || !email || !phone || !course || !time) {
-        alert('Todos los campos son obligatorios');
-        confirmButton.disabled = false; // Volver a habilitar el botón
+        showModal('Camp Obligatori', 'Tots els camps són obligatoris.');
+        confirmButton.disabled = false;
         return;
     }
 
     if (!validateName(name) || !validateEmail(email) || !validatePhone(phone)) {
-        alert('Por favor, verifica que todos los campos estén en el formato correcto.');
-        confirmButton.disabled = false; // Volver a habilitar el botón
+        showModal('Format Invàlid', 'Verifica que tots els camps tinguin el format correcte.');
+        confirmButton.disabled = false;
         return;
     }
 
@@ -96,25 +119,22 @@ async function saveReservation() {
         });
 
         if (response.ok) {
-            const result = await response.json();
-            alert('Reserva confirmada!');
-            reservations.push({ date: selectedDate, hour: time });
-            updateCalendar();
-            document.getElementById('bookingForm').style.display = 'none';
+            showModal('Reserva Confirmada ✅', 'La teva cita s\'ha reservat correctament.', () => {
+                reservations.push({ date: selectedDate, hour: time });
+                updateCalendar();
+                document.getElementById('bookingForm').style.display = 'none';
+            });
         } else {
             const errorData = await response.json();
-            alert('Hubo un error al reservar la cita: ' + errorData.message);
+            showModal('Error en la Reserva ❌', 'Hi ha hagut un error: ' + errorData.message);
         }
     } catch (error) {
         console.error('Error al guardar la reserva:', error);
-        alert('Hubo un error al guardar la reserva. Inténtalo más tarde.');
+        showModal('Error ❌', 'No s\'ha pogut guardar la reserva. Torna-ho a intentar més tard.');
     } finally {
-        confirmButton.disabled = false; // Volver a habilitar el botón después de la respuesta
+        confirmButton.disabled = false;
     }
 }
-
-
-
 
 document.getElementById('confirmBooking').addEventListener('click', saveReservation);
 
@@ -122,6 +142,7 @@ function updateCalendar() {
     calendar.innerHTML = '';
     const firstDay = new Date(currentYear, currentMonthIndex, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonthIndex + 1, 0).getDate();
+
     currentMonth.textContent = new Date(currentYear, currentMonthIndex).toLocaleString('ca-ES', {
         month: 'long',
         year: 'numeric',
@@ -129,38 +150,44 @@ function updateCalendar() {
 
     const todayStr = today.toISOString().split('T')[0];
 
-    // Agregar espacios en blanco antes del primer día del mes
+    // 🔒 Deshabilitar botón de "Mes anterior" si se muestra el mes actual o anterior
+    if (currentYear === today.getFullYear() && currentMonthIndex === today.getMonth()) {
+        prevMonthButton.disabled = true;
+    } else {
+        prevMonthButton.disabled = false;
+    }
+
+    // Espacios en blanco antes del primer día del mes
     for (let i = 0; i < (firstDay === 0 ? 6 : firstDay - 1); i++) {
         calendar.innerHTML += '<div class="day disabled"></div>';
     }
 
     // Crear los días del mes
     for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${currentYear}-${(currentMonthIndex + 1).toString().padStart(2, '0')}-${day
-            .toString()
-            .padStart(2, '0')}`;
-
+        const dateStr = `${currentYear}-${(currentMonthIndex + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         let dayClass = 'day';
 
         if (reservations.some(r => r.date === dateStr)) {
-            dayClass += ' reserved'; // Marcar como reservado
+            dayClass += ' reserved';
         }
 
-        if (dateStr <= todayStr) {
-            dayClass += ' disabled'; // Deshabilitar días pasados
+        if (dateStr < todayStr) {
+            dayClass += ' disabled';
         }
 
         const onClick = dayClass.includes('reserved') || dayClass.includes('disabled')
-            ? '' // No agregar evento onclick si está reservado o deshabilitado
+            ? ''
             : `onclick="selectDate('${dateStr}')"`;
 
         calendar.innerHTML += `<div class="${dayClass}" ${onClick}>${day}</div>`;
     }
 }
 
+updateCalendar(); // Inicializar el calendario al cargar
+
 function selectDate(date) {
     if (reservations.some(r => r.date === date)) {
-        alert('Aquest dia ja està reservat.');
+        showModal('Data No Disponible', 'Aquest dia ja està reservat.');
         return; // Evita abrir el formulario si el día está reservado
     }
 
@@ -182,12 +209,16 @@ function selectDate(date) {
 
 
 prevMonthButton.addEventListener('click', () => {
-    currentMonthIndex--;
-    if (currentMonthIndex < 0) {
-        currentMonthIndex = 11;
-        currentYear--;
+
+    // Solo permite retroceder si el mes mostrado es posterior al actual
+    if (currentYear > today.getFullYear() || (currentYear === today.getFullYear() && currentMonthIndex > today.getMonth())) {
+        currentMonthIndex--;
+        if (currentMonthIndex < 0) {
+            currentMonthIndex = 11;
+            currentYear--;
+        }
+        updateCalendar();
     }
-    updateCalendar();
 });
 
 nextMonthButton.addEventListener('click', () => {

@@ -7,7 +7,7 @@
     <title>Cita Prèvia Institut Baix Camp</title>
     <link href="{{ asset('css/calendar.css') }}" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    </head>
+</head>
 
 <body>
     <div class="container">
@@ -55,7 +55,17 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/calendar.js') }}"></script>
+    <!-- Modal -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="modalTitle"></h3>
+            <p id="modalMessage"></p>
+            <button id="modalActionButton">OK</button>
+        </div>
+    </div>
+
+    <script src="{{ asset(path: 'js/calendar.js') }}"></script>
 </body>
 
 </html>
