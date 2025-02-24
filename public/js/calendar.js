@@ -54,6 +54,9 @@ function validatePhone(phone) {
 }
 
 async function saveReservation() {
+    const confirmButton = document.getElementById('confirmBooking');
+    confirmButton.disabled = true; // Deshabilitar el botón mientras se procesa
+
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const phone = document.getElementById('phone').value.trim();
@@ -62,12 +65,13 @@ async function saveReservation() {
 
     if (!name || !email || !phone || !course || !time) {
         alert('Todos los campos son obligatorios');
+        confirmButton.disabled = false; // Volver a habilitar el botón
         return;
     }
 
-    // Validar formato de los datos
     if (!validateName(name) || !validateEmail(email) || !validatePhone(phone)) {
         alert('Por favor, verifica que todos los campos estén en el formato correcto.');
+        confirmButton.disabled = false; // Volver a habilitar el botón
         return;
     }
 
@@ -94,14 +98,8 @@ async function saveReservation() {
         if (response.ok) {
             const result = await response.json();
             alert('Reserva confirmada!');
-
-            // Agregar la fecha reservada al arreglo de reservas
             reservations.push({ date: selectedDate, hour: time });
-
-            // Actualizar el calendario
             updateCalendar();
-
-            // Ocultar el formulario de reserva
             document.getElementById('bookingForm').style.display = 'none';
         } else {
             const errorData = await response.json();
@@ -110,8 +108,11 @@ async function saveReservation() {
     } catch (error) {
         console.error('Error al guardar la reserva:', error);
         alert('Hubo un error al guardar la reserva. Inténtalo más tarde.');
+    } finally {
+        confirmButton.disabled = false; // Volver a habilitar el botón después de la respuesta
     }
 }
+
 
 
 
