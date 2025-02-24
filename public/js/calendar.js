@@ -98,6 +98,13 @@ async function saveReservation() {
         return;
     }
 
+    // Verificar si ya hay una reserva para el día y la hora seleccionada
+    if (reservations.some(r => r.date === selectedDate && r.hour === time)) {
+        showModal('Hora No Disponible', 'Aquesta hora ja està reservada. Tria una altra hora.');
+        confirmButton.disabled = false;
+        return;
+    }
+
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const data = {
         date: selectedDate,
@@ -136,6 +143,7 @@ async function saveReservation() {
     }
 }
 
+
 document.getElementById('confirmBooking').addEventListener('click', saveReservation);
 
 function updateCalendar() {
@@ -148,9 +156,9 @@ function updateCalendar() {
         year: 'numeric',
     });
 
-    const todayStr = today.toISOString().split('T')[0];
+    const todayStr = today.toISOString().split('T')[0]; // Obtiene la fecha de hoy en formato 'YYYY-MM-DD'
+    const todayDateStr = `${currentYear}-${(currentMonthIndex + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
 
-    // 🔒 Deshabilitar botón de "Mes anterior" si se muestra el mes actual o anterior
     if (currentYear === today.getFullYear() && currentMonthIndex === today.getMonth()) {
         prevMonthButton.disabled = true;
     } else {
@@ -159,54 +167,88 @@ function updateCalendar() {
 
     // Espacios en blanco antes del primer día del mes
     for (let i = 0; i < (firstDay === 0 ? 6 : firstDay - 1); i++) {
-        calendar.innerHTML += '<div class="day disabled"></div>';
+        const dayDiv = document.createElement('div');
+        dayDiv.classList.add('day', 'disabled');
+        calendar.appendChild(dayDiv);
     }
 
-    // Crear los días del mes
     for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${currentYear}-${(currentMonthIndex + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        let dayClass = 'day';
+        const dayDiv = document.createElement('div');
+        dayDiv.classList.add('day');
 
-        if (reservations.some(r => r.date === dateStr)) {
-            dayClass += ' reserved';
+        const reservedHours = reservations.filter(r => r.date === dateStr).map(r => r.hour);
+
+        // Si es un día pasado con reservas, marcarlo en amarillo
+        if (dateStr < todayStr && reservedHours.length > 0) {
+            dayDiv.classList.add('past-reserved'); // Añadir clase para días pasados con reservas
         }
 
+        // Verificamos si el día está lleno o tiene reservas
+        if (reservedHours.length === 5) {
+            dayDiv.classList.add('full');
+        } else if (reservedHours.length > 0) {
+            dayDiv.classList.add('reserved');
+        }
+
+        // Si el día es pasado, marcamos como disabled para que no se pueda seleccionar
         if (dateStr < todayStr) {
-            dayClass += ' disabled';
+            dayDiv.classList.add('disabled');
         }
 
-        const onClick = dayClass.includes('reserved') || dayClass.includes('disabled')
-            ? ''
-            : `onclick="selectDate('${dateStr}')"`;
+        // Resaltamos el día actual
+        if (dateStr === todayDateStr) {
+            dayDiv.classList.add('disabled');
+        }
 
-        calendar.innerHTML += `<div class="${dayClass}" ${onClick}>${day}</div>`;
+        // Función de selección para los días disponibles
+        const onClick = (reservedHours.length === 5 || dayDiv.classList.contains('disabled'))
+            ? null
+            : function () { selectDate(dateStr, reservedHours); };
+
+        dayDiv.textContent = day;
+        dayDiv.onclick = onClick;
+        calendar.appendChild(dayDiv);
     }
 }
 
+
 updateCalendar(); // Inicializar el calendario al cargar
 
-function selectDate(date) {
-    if (reservations.some(r => r.date === date)) {
-        showModal('Data No Disponible', 'Aquest dia ja està reservat.');
-        return; // Evita abrir el formulario si el día está reservado
+function selectDate(date, reservedHours) {
+    // Si el día tiene todas las horas reservadas, mostramos un mensaje
+    if (reservedHours.length === 5) {
+        showModal('Data Completa', 'Aquest dia ja està completament reservat.');
+        return;
     }
 
     selectedDate = date;
     selectedDateSpan.textContent = date;
     bookingForm.style.display = 'block';
 
-    const availableHours = ['09:00', '10:00', '11:00', '12:00', '13:00']; // Ejemplo de horas fijas
+    // Las horas de disponibilidad son las mismas para todo el día (mañana y tarde)
+    const availableHours = ['09:00', '10:00', '11:00', '12:00', '13:00']; // Aquí puedes añadir más horas si quieres
 
     const timeSlot = document.getElementById('timeSlot');
-    timeSlot.innerHTML = ''; // Limpia las opciones anteriores
+    timeSlot.innerHTML = ''; // Limpiamos las opciones anteriores
+
     availableHours.forEach(hour => {
+        // Si la hora está reservada, no se muestra en las opciones
+        if (reservedHours.includes(hour)) {
+            return;
+        }
+
         const option = document.createElement('option');
         option.value = hour;
         option.textContent = hour;
         timeSlot.appendChild(option);
     });
-}
 
+    // Si hay al menos una hora disponible, mostramos un aviso
+    if (reservedHours.length < 5) {
+        showModal('Data Disponible', 'Aquest dia encara té hores disponibles. Tria una hora.');
+    }
+}
 
 prevMonthButton.addEventListener('click', () => {
 

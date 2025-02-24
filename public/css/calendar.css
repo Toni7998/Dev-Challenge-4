@@ -118,10 +118,11 @@ input:focus {
 }
 
 .day.disabled {
-    background: #b2bec3;
+    background: #b2bec3 !important;  /* Cambia a gris o el color que prefieras */
     color: #636e72;
     cursor: not-allowed;
 }
+
 
 .day.selected {
     background: #6c5ce7;
@@ -133,6 +134,16 @@ input:focus {
     color: white;
     cursor: not-allowed;
 }
+
+.day.full {
+    background-color: red;
+    pointer-events: none; /* Evita que el día se seleccione */
+}
+
+.day.reserved {
+    background-color: rgb(170, 170, 12); /* Puedes usar cualquier color para los días parcialmente reservados */
+}
+
 
 /* Reservation Form */
 #bookingForm {
