@@ -69,10 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Actualiza las horas disponibles según el curso y su turno
 function updateAvailableHours() {
+    if (!selectedDate) return; // Si no hay una fecha seleccionada, no hacemos nada
+
     const selectedOption = courseSelect.options[courseSelect.selectedIndex];
-    const shift = selectedOption.getAttribute('data-shift'); // "matí" o "tarda"
-    
-    if (!selectedDate || !shift) return;
+    const shift = selectedOption?.getAttribute('data-shift'); // "matí" o "tarda"
+
+    if (!shift) return;
 
     timeSlot.innerHTML = ''; // Limpiar opciones previas
 
@@ -92,7 +94,9 @@ function updateAvailableHours() {
 }
 
 // Evento para actualizar horas al cambiar curso
-courseSelect.addEventListener('change', updateAvailableHours);
+courseSelect.addEventListener('change', () => {
+    updateAvailableHours();
+});
 
 function validateName(name) {
     const nameRegex = /^[A-Za-zÀ-ÿ\s]{2,}$/; // Permite letras, espacios, y caracteres acentuados
@@ -247,10 +251,9 @@ function updateCalendar() {
 
 updateCalendar(); // Inicializar el calendario al cargar
 
-function selectDate(date, reservedHours) {
-    // Si el día tiene todas las horas reservadas, mostramos un mensaje
-    if (reservedHours.length === 5) {
-        showModal('Data Completa', 'Aquest dia ja està completament reservat.');
+function selectDate(date) {
+    if (!courseSelect.value) {
+        showModal('Selecció Requerida', 'Si us plau, selecciona un grup abans de triar un dia.');
         return;
     }
 
@@ -258,32 +261,7 @@ function selectDate(date, reservedHours) {
     selectedDateSpan.textContent = date;
     bookingForm.style.display = 'block';
 
-    // Las horas de disponibilidad son las mismas para todo el día (mañana y tarde)
-    const availableHours = ['09:00', '10:00', '11:00', '12:00', '13:00']; // Aquí puedes añadir más horas si quieres
-
-    const timeSlot = document.getElementById('timeSlot');
-    timeSlot.innerHTML = ''; // Limpiamos las opciones anteriores
-
-    availableHours.forEach(hour => {
-        // Si la hora está reservada, no la mostramos en las opciones, pero mostramos visualmente
-        const option = document.createElement('option');
-        option.value = hour;
-
-        if (reservedHours.includes(hour)) {
-            option.textContent = hour + " (Reservada)";
-            option.disabled = true; // No permite seleccionar esta hora
-            option.style.color = 'gray'; // Hacer que se vea diferente
-        } else {
-            option.textContent = hour;
-        }
-
-        timeSlot.appendChild(option);
-    });
-
-    // Si hay al menos una hora disponible, mostramos un aviso
-    if (reservedHours.length < 5) {
-        showModal('Data Disponible', 'Aquest dia encara té hores disponibles. Tria una hora.');
-    }
+    updateAvailableHours();
 }
 
 prevMonthButton.addEventListener('click', () => {
