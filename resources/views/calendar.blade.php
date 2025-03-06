@@ -16,9 +16,14 @@
         <label for="course">Selecciona el teu curs:</label>
         <select id="course" required>
             <option value="">-- Selecciona un curs --</option>
-            <option value="DAW">DAW (matí)</option>
-            <option value="DAM">DAM (tarda)</option>
-            <option value="SMX">SMX (matí)</option>
+            <option value="DAW" data-shift="matí">DAW (Matí)</option>
+            <option value="DAW" data-shift="tarda">DAW (Tarda)</option>
+            <option value="DAM" data-shift="matí">DAM (Matí)</option>
+            <option value="DAM" data-shift="tarda">DAM (Tarda)</option>
+            <option value="ASIX" data-shift="matí">ASIX (Matí)</option>
+            <option value="ASIX" data-shift="tarda">ASIX (Tarda)</option>
+            <option value="SMX" data-shift="matí">SMX (Matí)</option>
+            <option value="SMX" data-shift="tarda">SMX (Tarda)</option>
         </select>
 
         <div class="calendar-container">

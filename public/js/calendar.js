@@ -10,6 +10,8 @@ let today = new Date();
 let currentYear = today.getFullYear();
 let currentMonthIndex = today.getMonth();
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const timeSlot = document.getElementById('timeSlot');
+const courseSelect = document.getElementById('course');
 
 // Modal functions
 const modal = document.getElementById('modal');
@@ -34,6 +36,11 @@ function showModal(title, message, callback = null) {
     window.onclick = null;
 }
 
+// Horarios de mañana y tarde
+const schedule = {
+    matí: ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00'],
+    tarda: ['15:00', '16:00', '17:00', '18:00', '19:00', '20:00']
+};
 
 async function loadReservations() {
     try {
@@ -60,6 +67,32 @@ document.addEventListener('DOMContentLoaded', () => {
     loadReservations();
 });
 
+// Actualiza las horas disponibles según el curso y su turno
+function updateAvailableHours() {
+    const selectedOption = courseSelect.options[courseSelect.selectedIndex];
+    const shift = selectedOption.getAttribute('data-shift'); // "matí" o "tarda"
+    
+    if (!selectedDate || !shift) return;
+
+    timeSlot.innerHTML = ''; // Limpiar opciones previas
+
+    // Obtener las reservas del día en la misma franja horaria
+    const reservedHours = reservations
+        .filter(r => r.date === selectedDate && schedule[shift].includes(r.hour))
+        .map(r => r.hour);
+
+    // Generar opciones disponibles
+    schedule[shift].forEach(hour => {
+        const option = document.createElement('option');
+        option.value = hour;
+        option.textContent = reservedHours.includes(hour) ? `${hour} (Reservada)` : hour;
+        option.disabled = reservedHours.includes(hour);
+        timeSlot.appendChild(option);
+    });
+}
+
+// Evento para actualizar horas al cambiar curso
+courseSelect.addEventListener('change', updateAvailableHours);
 
 function validateName(name) {
     const nameRegex = /^[A-Za-zÀ-ÿ\s]{2,}$/; // Permite letras, espacios, y caracteres acentuados
@@ -237,7 +270,7 @@ function selectDate(date, reservedHours) {
         option.value = hour;
 
         if (reservedHours.includes(hour)) {
-            option.textContent = hour + " (Reservado)";
+            option.textContent = hour + " (Reservada)";
             option.disabled = true; // No permite seleccionar esta hora
             option.style.color = 'gray'; // Hacer que se vea diferente
         } else {
