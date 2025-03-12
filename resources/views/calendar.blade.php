@@ -11,6 +11,10 @@
 
 <body>
     <div class="container">
+
+        <!-- Botón de Guía (movido fuera del calendario) -->
+        <button id="infoButton" class="info-button">?</button>
+
         <h2>Reserva la teva cita</h2>
 
         <label for="course">Selecciona el teu curs:</label>

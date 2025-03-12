@@ -36,6 +36,17 @@ function showModal(title, message, callback = null) {
     window.onclick = null;
 }
 
+document.getElementById('infoButton').addEventListener('click', () => {
+    showModal('Guia d\'ús 🗓️',
+        '🔹 Selecciona un curs abans de triar un dia.\n' +
+        '🔹 Fes clic en un dia disponible per veure les hores disponibles.\n' +
+        '🔹 Completa el formulari amb les teves dades i confirma la reserva.\n' +
+        '🔹 Rep la confirmació per correu electrònic. 📩\n\n' +
+        '📍 Els dies marcats en groc tenen reserves anteriors.\n' +
+        '❌ Els dies passats i plens no es poden seleccionar.'
+    );
+});
+
 // Horarios de mañana y tarde
 const schedule = {
     matí: ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00'],

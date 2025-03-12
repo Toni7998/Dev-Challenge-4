@@ -39,7 +39,7 @@ input[type="tel"] {
     border-radius: 10px;
     font-size: 1rem;
     background-color: #f4f6f7;
-    text-align:center;
+    text-align: center;
 }
 
 select:focus,
@@ -118,7 +118,8 @@ input:focus {
 }
 
 .day.disabled {
-    background: #b2bec3 !important;  /* Cambia a gris o el color que prefieras */
+    background: #b2bec3 !important;
+    /* Cambia a gris o el color que prefieras */
     color: #636e72;
     cursor: not-allowed;
 }
@@ -137,11 +138,13 @@ input:focus {
 
 .day.full {
     background-color: red;
-    pointer-events: none; /* Evita que el día se seleccione */
+    pointer-events: none;
+    /* Evita que el día se seleccione */
 }
 
 .day.reserved {
-    background-color: rgb(170, 170, 12); /* Puedes usar cualquier color para los días parcialmente reservados */
+    background-color: rgb(170, 170, 12);
+    /* Puedes usar cualquier color para los días parcialmente reservados */
 }
 
 /* Reservation Form */
@@ -211,7 +214,8 @@ input:focus {
 .modal-content {
     background: #fff;
     /* Se reduce el padding superior para eliminar el espacio extra */
-    padding: 10px 30px 20px; /* top: 10px, laterales: 30px, bottom: 20px */
+    padding: 10px 30px 20px;
+    /* top: 10px, laterales: 30px, bottom: 20px */
     border-radius: 12px;
     text-align: center;
     max-width: 400px;
@@ -223,7 +227,7 @@ input:focus {
 }
 
 /* Asegura que el primer elemento interno no tenga margen superior */
-.modal-content > *:first-child {
+.modal-content>*:first-child {
     margin-top: 0;
 }
 
@@ -278,7 +282,44 @@ input:focus {
 }
 
 .day.selected {
-    background: #6c5ce7; /* Un color llamativo */
+    background: #6c5ce7;
+    /* Un color llamativo */
     color: white;
     border: 2px solid #ffffff;
+}
+
+/* Botón de Guía */
+.info-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #0984e3;
+    color: white;
+    border: 2px solid white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease, transform 0.2s ease-in-out;
+}
+
+.info-button:hover {
+    background-color: #74b9ff;
+    transform: scale(1.1);
+}
+
+/* Para evitar problemas de clic */
+.info-button:focus {
+    outline: none;
+}
+
+/* Si el botón está dentro del contenedor principal */
+.container {
+    position: relative;
 }
