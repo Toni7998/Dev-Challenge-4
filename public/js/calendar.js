@@ -194,7 +194,7 @@ function updateCalendar() {
     });
 
     const todayStr = today.toISOString().split('T')[0]; // Obtiene la fecha de hoy en formato 'YYYY-MM-DD'
-    const todayDateStr = `${currentYear}-${(currentMonthIndex + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+    const todayDateStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
 
     if (currentYear === today.getFullYear() && currentMonthIndex === today.getMonth()) {
         prevMonthButton.disabled = true;
@@ -257,6 +257,17 @@ function selectDate(date) {
         return;
     }
 
+    // Remover la clase 'selected' de todos los días previamente seleccionados
+    document.querySelectorAll('.day.selected').forEach(day => day.classList.remove('selected'));
+
+    // Buscar el elemento del día seleccionado y añadir la clase 'selected'
+    const dayElements = document.querySelectorAll('.calendar-grid .day');
+    dayElements.forEach(dayElement => {
+        if (dayElement.textContent === date.split('-')[2]) {
+            dayElement.classList.add('selected');
+        }
+    });
+
     selectedDate = date;
     selectedDateSpan.textContent = date;
     bookingForm.style.display = 'block';
@@ -264,9 +275,8 @@ function selectDate(date) {
     updateAvailableHours();
 }
 
-prevMonthButton.addEventListener('click', () => {
 
-    // Solo permite retroceder si el mes mostrado es posterior al actual
+prevMonthButton.addEventListener('click', () => {
     if (currentYear > today.getFullYear() || (currentYear === today.getFullYear() && currentMonthIndex > today.getMonth())) {
         currentMonthIndex--;
         if (currentMonthIndex < 0) {
