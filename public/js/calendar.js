@@ -163,11 +163,16 @@ async function saveReservation() {
         });
 
         if (response.ok) {
-            showModal('Reserva Confirmada ✅', 'La teva cita s\'ha reservat correctament.', () => {
-                reservations.push({ date: selectedDate, hour: time });
-                updateCalendar();
-                document.getElementById('bookingForm').style.display = 'none';
-            });
+            showModal(
+                'Reserva Confirmada ✅',
+                'La teva cita s\'ha reservat correctament. 📅\n\n' +
+                '🔹 Revisa el teu correu electrònic 📩 per rebre tota la informació sobre la teva reserva.\n\n' +
+                '🔹 Si no el trobes, comprova la carpeta de correu no desitjat o spam. 📬',
+                () => {
+                    reservations.push({ date: selectedDate, hour: time });
+                    updateCalendar();
+                    document.getElementById('bookingForm').style.display = 'none';
+                });
         } else {
             const errorData = await response.json();
             showModal('Error en la Reserva ❌', 'Hi ha hagut un error: ' + errorData.message);

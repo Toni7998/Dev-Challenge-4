@@ -210,7 +210,8 @@ input:focus {
 
 .modal-content {
     background: #fff;
-    padding: 20px 30px;
+    /* Se reduce el padding superior para eliminar el espacio extra */
+    padding: 10px 30px 20px; /* top: 10px, laterales: 30px, bottom: 20px */
     border-radius: 12px;
     text-align: center;
     max-width: 400px;
@@ -218,6 +219,12 @@ input:focus {
     position: relative;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     animation: fadeInScale 0.3s ease;
+    white-space: pre-line;
+}
+
+/* Asegura que el primer elemento interno no tenga margen superior */
+.modal-content > *:first-child {
+    margin-top: 0;
 }
 
 .modal-content h3 {
@@ -225,8 +232,11 @@ input:focus {
 }
 
 .modal-content p {
-    margin: 15px 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 5px 0;
 }
+
 
 .close-button {
     position: absolute;
