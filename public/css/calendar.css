@@ -20,6 +20,11 @@ body {
     padding: 30px;
 }
 
+/* Si el botón está dentro del contenedor principal */
+.container {
+    position: relative;
+}
+
 h2 {
     text-align: center;
     margin-bottom: 20px;
@@ -124,18 +129,6 @@ input:focus {
     cursor: not-allowed;
 }
 
-
-.day.selected {
-    background: #6c5ce7;
-    color: white;
-}
-
-.day.reserved {
-    background: red;
-    color: white;
-    cursor: not-allowed;
-}
-
 .day.full {
     background-color: red;
     pointer-events: none;
@@ -144,7 +137,6 @@ input:focus {
 
 .day.reserved {
     background-color: rgb(170, 170, 12);
-    /* Puedes usar cualquier color para los días parcialmente reservados */
 }
 
 /* Reservation Form */
@@ -283,10 +275,10 @@ input:focus {
 
 .day.selected {
     background: #6c5ce7;
-    /* Un color llamativo */
     color: white;
     border: 2px solid #ffffff;
 }
+
 
 /* Botón de Guía */
 .info-button {
@@ -311,15 +303,10 @@ input:focus {
 
 .info-button:hover {
     background-color: #74b9ff;
-    transform: scale(1.1);
+    transform: scale(1.4);
 }
 
 /* Para evitar problemas de clic */
 .info-button:focus {
     outline: none;
-}
-
-/* Si el botón está dentro del contenedor principal */
-.container {
-    position: relative;
 }

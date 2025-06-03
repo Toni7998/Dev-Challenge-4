@@ -52,16 +52,22 @@
 
         <!-- En el formulario de reservas -->
         <div id="bookingForm" class="hidden">
-            <h3>Detalls de la reserva</h3>
+            <p>
+                <strong>Detalls de la reserva</strong> <br> <br>
+                Data seleccionada: <span id="selectedDate"></span>
+                <br> 
+            </p>
+
             <label for="timeSlot">Selecciona l'hora:</label>
             <select id="timeSlot" required></select>
+
             <input type="text" id="name" placeholder="El teu nom" required>
             <input type="email" id="email" placeholder="El teu correu" required>
             <input type="tel" id="phone" placeholder="Telèfon" required>
+
             <button id="confirmBooking">Confirmar Cita</button>
-            <!-- Aquí añadimos un span para mostrar la fecha seleccionada -->
-            <p>Data seleccionada: <span id="selectedDate"></span></p>
         </div>
+
     </div>
 
     <!-- Modal -->

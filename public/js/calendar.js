@@ -232,37 +232,36 @@ function updateCalendar() {
 
         const reservedHours = reservations.filter(r => r.date === dateStr).map(r => r.hour);
 
-        // Si es un día pasado con reservas, marcarlo en amarillo
-        if (dateStr < todayStr && reservedHours.length > 0) {
-            dayDiv.classList.add('past-reserved'); // Añadir clase para días pasados con reservas
+        // Convertir string a objeto Date solo para comparación segura
+        const currentDayDate = new Date(currentYear, currentMonthIndex, day);
+        const isTodayOrBefore = currentDayDate <= new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+        // Si es hoy o día pasado: deshabilitado
+        if (isTodayOrBefore) {
+            dayDiv.classList.add('disabled');
         }
 
-        // Verificamos si el día está lleno o tiene reservas
+        // Día pasado con reservas: amarillo
+        if (currentDayDate < today && reservedHours.length > 0) {
+            dayDiv.classList.add('past-reserved');
+        }
+
+        // Día con 5 reservas: lleno
         if (reservedHours.length === 5) {
             dayDiv.classList.add('full');
         } else if (reservedHours.length > 0) {
             dayDiv.classList.add('reserved');
         }
 
-        // Si el día es pasado, marcamos como disabled para que no se pueda seleccionar
-        if (dateStr < todayStr) {
-            dayDiv.classList.add('disabled');
+        // Solo permitir clic si el día no está deshabilitado y no está lleno
+        if (!dayDiv.classList.contains('disabled') && !dayDiv.classList.contains('full')) {
+            dayDiv.onclick = () => selectDate(dateStr, reservedHours);
         }
-
-        // Resaltamos el día actual
-        if (dateStr === todayDateStr) {
-            dayDiv.classList.add('disabled');
-        }
-
-        // Función de selección para los días disponibles
-        const onClick = (reservedHours.length === 5 || dayDiv.classList.contains('disabled'))
-            ? null
-            : function () { selectDate(dateStr, reservedHours); };
 
         dayDiv.textContent = day;
-        dayDiv.onclick = onClick;
         calendar.appendChild(dayDiv);
     }
+
 }
 
 updateCalendar(); // Inicializar el calendario al cargar
