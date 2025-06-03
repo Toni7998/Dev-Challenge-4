@@ -6,7 +6,7 @@ const reservationForm = document.getElementById('bookingForm');
 const selectedDateSpan = document.getElementById('selectedDate');
 let selectedDate = null;
 let reservations = [];
-let today = new Date();
+const today = new Date();
 let currentYear = today.getFullYear();
 let currentMonthIndex = today.getMonth();
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -266,29 +266,32 @@ function updateCalendar() {
 
 updateCalendar(); // Inicializar el calendario al cargar
 
-function selectDate(date) {
+function selectDate(date, reservedHours) {
     if (!courseSelect.value) {
         showModal('Selecció Requerida', 'Si us plau, selecciona un grup abans de triar un dia.');
         return;
     }
 
-    // Remover la clase 'selected' de todos los días previamente seleccionados
+    // Quitar selección previa
     document.querySelectorAll('.day.selected').forEach(day => day.classList.remove('selected'));
 
-    // Buscar el elemento del día seleccionado y añadir la clase 'selected'
-    const dayElements = document.querySelectorAll('.calendar-grid .day');
-    dayElements.forEach(dayElement => {
-        if (dayElement.textContent === date.split('-')[2]) {
-            dayElement.classList.add('selected');
-        }
+    // Marcar el nuevo día como seleccionado
+    const matchingDay = Array.from(document.querySelectorAll('.day')).find(day => {
+        const dayText = parseInt(day.textContent);
+        const dayDateStr = `${currentYear}-${(currentMonthIndex + 1).toString().padStart(2, '0')}-${dayText.toString().padStart(2, '0')}`;
+        return dayDateStr === date;
     });
 
-    selectedDate = date;
-    selectedDateSpan.textContent = date;
-    bookingForm.style.display = 'block';
+    if (matchingDay) {
+        matchingDay.classList.add('selected');
+    }
 
+    selectedDate = date;
+    selectedDateSpan.textContent = new Date(date).toLocaleDateString('ca-ES');
+    reservationForm.style.display = 'block';
     updateAvailableHours();
 }
+
 
 
 prevMonthButton.addEventListener('click', () => {
