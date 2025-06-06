@@ -321,3 +321,19 @@ nextMonthButton.addEventListener('click', () => {
 });
 
 updateCalendar();
+
+let availabilities = [];
+
+async function loadAvailabilities() {
+    const response = await fetch('/api/availabilities');
+    if (response.ok) {
+        availabilities = await response.json();
+        updateCalendar();
+    }
+}
+
+// Llamar también a esta al cargar:
+document.addEventListener('DOMContentLoaded', () => {
+    loadReservations();
+    loadAvailabilities();
+});

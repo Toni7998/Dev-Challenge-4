@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReservationController;
-use App\Models\Reservation; 
+use App\Models\Reservation;
+use App\Http\Controllers\AvailabilityController;
+use App\Models\Availability;
 
 // Consultar disponibilidad por fecha
 Route::get('/availability/{date}', [ReservationController::class, 'checkAvailability'])->name('availability.check');
@@ -54,4 +56,15 @@ Route::get('/cancel-reservation/{uuid}', function ($uuid) {
     ]);
 });
 
+// === Backoffice per gestionar disponibilitat ===
+Route::get('/availabilities', [AvailabilityController::class, 'index']);
+Route::post('/availabilities', [AvailabilityController::class, 'store']);
 
+// Esta ruta simula una API, pero está en web.php
+Route::get('/api/availabilities', function () {
+    return response()->json(Availability::all());
+});
+
+Route::get('/backoffice', function () {
+    return view('backoffice'); // Asegúrate de que tu archivo esté en resources/views/backoffice.blade.php
+});

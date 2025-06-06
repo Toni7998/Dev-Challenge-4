@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ReservationController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AvailabilityController;
 
 // Obtener todas las reservas
 Route::get('reservations', [ReservationController::class, 'getReservations']);
@@ -14,3 +15,6 @@ Route::get('available-hours/{date}', [ReservationController::class, 'getAvailabl
 
 // Cancelar una reserva
 Route::delete('cancel', [ReservationController::class, 'cancelReservation']);
+
+Route::post('/availabilities', [AvailabilityController::class, 'store']);
+Route::get('/availabilities', [AvailabilityController::class, 'index']);
