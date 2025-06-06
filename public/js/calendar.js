@@ -230,7 +230,15 @@ function updateCalendar() {
         const dayDiv = document.createElement('div');
         dayDiv.classList.add('day');
 
-        const reservedHours = reservations.filter(r => r.date === dateStr).map(r => r.hour);
+        const selectedOption = courseSelect.options[courseSelect.selectedIndex];
+
+        const reservedHours = reservations
+            .filter(r => r.date === dateStr)
+            .map(r => r.hour);
+
+        const allShiftHours = [...schedule['matí'], ...schedule['tarda']];
+        const isFullDay = allShiftHours.every(hour => reservedHours.includes(hour));
+        const isPartiallyReserved = reservedHours.length > 0 && !isFullDay;
 
         // Convertir string a objeto Date solo para comparación segura
         const currentDayDate = new Date(currentYear, currentMonthIndex, day);
@@ -246,16 +254,14 @@ function updateCalendar() {
             dayDiv.classList.add('past-reserved');
         }
 
-        // Día con 5 reservas: lleno
-        if (reservedHours.length === 5) {
+        if (isFullDay) {
             dayDiv.classList.add('full');
-        } else if (reservedHours.length > 0) {
+        } else if (isPartiallyReserved) {
             dayDiv.classList.add('reserved');
         }
 
-        // Solo permitir clic si el día no está deshabilitado y no está lleno
-        if (!dayDiv.classList.contains('disabled') && !dayDiv.classList.contains('full')) {
-            dayDiv.onclick = () => selectDate(dateStr, reservedHours);
+        if (!dayDiv.classList.contains('disabled') && !isFullDay) {
+            dayDiv.onclick = () => selectDate(dateStr);
         }
 
         dayDiv.textContent = day;
