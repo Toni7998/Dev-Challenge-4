@@ -57,14 +57,11 @@ Route::get('/cancel-reservation/{uuid}', function ($uuid) {
 });
 
 // === Backoffice per gestionar disponibilitat ===
-Route::get('/availabilities', [AvailabilityController::class, 'index']);
-Route::post('/availabilities', [AvailabilityController::class, 'store']);
-
-// Esta ruta simula una API, pero está en web.php
-Route::get('/api/availabilities', function () {
-    return response()->json(Availability::all());
-});
+Route::get('/reservations', [ReservationController::class, 'index']);
+Route::post('/reservations', [ReservationController::class, 'store']);
 
 Route::get('/backoffice', function () {
     return view('backoffice'); // Asegúrate de que tu archivo esté en resources/views/backoffice.blade.php
 });
+
+Route::post('/api/reservations', [ReservationController::class, 'store']);

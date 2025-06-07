@@ -138,6 +138,7 @@ class ReservationController extends Controller
             return response()->json(['message' => 'Error al procesar la reserva'], 500);
         }
     }
+    
     public function cancel($uuid)
     {
         // Buscar la reserva por UUID

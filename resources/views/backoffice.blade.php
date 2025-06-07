@@ -142,42 +142,70 @@
             <button type="submit" class="btn-primary">Guardar</button>
         </form>
 
+        <div id="message" style="margin-top:20px; text-align:center; font-weight:bold;"></div>
     </div>
 </body>
 
-
 <script>
-    document.getElementById('availabilityForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
+    const form = document.getElementById('availabilityForm');
+    const messageDiv = document.getElementById('message');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        messageDiv.textContent = '';
         const date = document.getElementById('date').value;
         const shift = document.getElementById('shift').value;
         const checkboxes = document.querySelectorAll('input[name="hours[]"]:checked');
         const hours = Array.from(checkboxes).map(cb => cb.value);
 
-        const response = await fetch('http://127.0.0.1:8000/api/reservations', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-                // No pongas X-CSRF-TOKEN si estás usando rutas API
-            },
-            body: JSON.stringify({
-                date,
-                shift,
-                hours
-            })
-        });
+        if (hours.length === 0) {
+            messageDiv.style.color = 'red';
+            messageDiv.textContent = 'Selecciona almenys una hora.';
+            return;
+        }
 
-        if (response.ok) {
-            alert('Disponibilitat guardada correctament!');
-            location.reload();
-        } else {
-            const error = await response.json();
-            alert('Error: ' + JSON.stringify(error));
+        // Desactivar botón para evitar múltiples envíos
+        form.querySelector('button[type="submit"]').disabled = true;
+
+        try {
+            for (const hour of hours) {
+                // Construimos el payload solo con los campos necesarios
+                const payload = {
+                    date,
+                    hour,
+                    shift,
+                };
+
+                const response = await fetch('/reserve', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(`Error reservant hora ${hour}: ${error.message || JSON.stringify(error)}`);
+                }
+            }
+
+            messageDiv.style.color = 'green';
+            messageDiv.textContent = 'Disponibilitat guardada correctament!';
+            form.reset();
+
+        } catch (error) {
+            messageDiv.style.color = 'red';
+            messageDiv.textContent = error.message;
+        } finally {
+            form.querySelector('button[type="submit"]').disabled = false;
         }
     });
 </script>
+
 
 
 </html>
