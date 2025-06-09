@@ -42,8 +42,8 @@ document.getElementById('infoButton').addEventListener('click', () => {
         '🔹 Fes clic en un dia disponible per veure les hores disponibles.\n' +
         '🔹 Completa el formulari amb les teves dades i confirma la reserva.\n' +
         '🔹 Rep la confirmació per correu electrònic. 📩\n\n' +
-        '📍 Els dies marcats en groc tenen reserves anteriors.\n' +
-        '❌ Els dies passats i plens no es poden seleccionar.'
+        '📍 Els dies marcats en groc tenen reserves prèvies.\n' +
+        '❌ Els dies passats i complets no es poden seleccionar.'
     );
 });
 
@@ -321,19 +321,3 @@ nextMonthButton.addEventListener('click', () => {
 });
 
 updateCalendar();
-
-let availabilities = [];
-
-async function loadAvailabilities() {
-    const response = await fetch('/api/availabilities');
-    if (response.ok) {
-        availabilities = await response.json();
-        updateCalendar();
-    }
-}
-
-// Llamar también a esta al cargar:
-document.addEventListener('DOMContentLoaded', () => {
-    loadReservations();
-    loadAvailabilities();
-});

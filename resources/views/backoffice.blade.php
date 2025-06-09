@@ -7,6 +7,7 @@
     <title>Gestió de Disponibilitat - Institut Baix Camp</title>
     <link href="{{ asset('css/calendar.css') }}" rel="stylesheet" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             background: #f4f6f8;
@@ -40,7 +41,7 @@
 
         input[type="date"],
         select {
-            width: 100%;
+            width: 95%;
             padding: 10px 12px;
             margin-top: 6px;
             border: 1px solid #ccc;
@@ -145,25 +146,44 @@
     const messageDiv = document.getElementById('message');
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+    // Bloque para evitar seleccionar hoy o fechas anteriores
+    const dateInput = document.getElementById('date');
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const yyyy = tomorrow.getFullYear();
+    const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const dd = String(tomorrow.getDate()).padStart(2, '0');
+    const minDate = `${yyyy}-${mm}-${dd}`;
+    dateInput.setAttribute('min', minDate);
+
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        messageDiv.textContent = '';
         const date = document.getElementById('date').value;
         const checkboxes = document.querySelectorAll('input[name="hours[]"]:checked');
         const hours = Array.from(checkboxes).map(cb => cb.value);
 
         if (hours.length === 0) {
-            messageDiv.style.color = 'red';
-            messageDiv.textContent = 'Selecciona almenys una hora.';
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sense hores seleccionades',
+                text: 'Selecciona almenys una hora.',
+            });
             return;
         }
 
-        // Desactivar botón para evitar múltiples envíos
         form.querySelector('button[type="submit"]').disabled = true;
+
+        Swal.fire({
+            title: 'Guardant disponibilitat...',
+            text: 'Si us plau, espera.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
         try {
             for (const hour of hours) {
-                // Construimos el payload solo con los campos necesarios
                 const payload = {
                     name: "admin",
                     email: "ruiz.toni.mrm@gmail.com",
@@ -189,17 +209,71 @@
                 }
             }
 
-            messageDiv.style.color = 'green';
-            messageDiv.textContent = 'Disponibilitat guardada correctament!';
+            Swal.fire({
+                icon: 'success',
+                title: 'Tot guardat!',
+                text: 'Disponibilitat guardada correctament.',
+            });
+
             form.reset();
 
         } catch (error) {
-            messageDiv.style.color = 'red';
-            messageDiv.textContent = error.message;
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message,
+            });
         } finally {
             form.querySelector('button[type="submit"]').disabled = false;
         }
     });
+
+    // Ocultar la interfaz hasta autenticar
+    document.querySelector('.container').style.display = 'none';
+
+    // Pedir usuario y contraseña con SweetAlert
+    async function promptLogin() {
+        const {
+            value: formValues
+        } = await Swal.fire({
+            title: 'Inici de Sessió',
+            html: '<input id="swal-user" class="swal2-input" placeholder="Usuari">' +
+                '<input id="swal-pass" type="password" class="swal2-input" placeholder="Contrasenya">',
+            focusConfirm: false,
+            confirmButtonText: 'Entrar',
+            allowOutsideClick: false,
+            preConfirm: () => {
+                const user = document.getElementById('swal-user').value.trim();
+                const pass = document.getElementById('swal-pass').value.trim();
+                if (!user || !pass) {
+                    Swal.showValidationMessage('Has d\'omplir tots els camps');
+                    return false;
+                }
+                return {
+                    user,
+                    pass
+                };
+            }
+        });
+
+        if (
+            formValues && ['antonio', 'oriol'].includes(formValues.user.toLowerCase()) &&
+            formValues.pass === 'admin'
+        ) {
+            document.querySelector('.container').style.display = 'block';
+        } else {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Credencials incorrectes',
+                text: 'Torna-ho a intentar.'
+            });
+            promptLogin(); // Reintentar login
+        }
+
+    }
+
+    // Iniciar el prompt de login en cuanto cargue la página
+    window.addEventListener('DOMContentLoaded', promptLogin);
 </script>
 
 
