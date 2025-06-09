@@ -3,8 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReservationController;
 use App\Models\Reservation;
-use App\Http\Controllers\AvailabilityController;
-use App\Models\Availability;
 
 // Consultar disponibilidad por fecha
 Route::get('/availability/{date}', [ReservationController::class, 'checkAvailability'])->name('availability.check');
@@ -61,7 +59,7 @@ Route::get('/reservations', [ReservationController::class, 'index']);
 Route::post('/reservations', [ReservationController::class, 'store']);
 
 Route::get('/backoffice', function () {
-    return view('backoffice'); // Asegúrate de que tu archivo esté en resources/views/backoffice.blade.php
+    return view('backoffice'); 
 });
 
 Route::post('/api/reservations', [ReservationController::class, 'store']);
