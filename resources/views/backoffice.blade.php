@@ -123,12 +123,6 @@
             <label for="date">Dia:</label>
             <input type="date" name="date" id="date" required>
 
-            <label for="shift">Torn:</label>
-            <select name="shift" id="shift" required>
-                <option value="matí">Matí</option>
-                <option value="tarda">Tarda</option>
-            </select>
-
             <label for="hours">Hores disponibles:</label>
             <div class="checkbox-group" id="hours">
                 @foreach (['08:00','09:00','10:00','11:00','12:00','13:00','15:00','16:00','17:00','18:00','19:00','20:00'] as $hour)
@@ -155,7 +149,6 @@
         e.preventDefault();
         messageDiv.textContent = '';
         const date = document.getElementById('date').value;
-        const shift = document.getElementById('shift').value;
         const checkboxes = document.querySelectorAll('input[name="hours[]"]:checked');
         const hours = Array.from(checkboxes).map(cb => cb.value);
 
@@ -172,9 +165,12 @@
             for (const hour of hours) {
                 // Construimos el payload solo con los campos necesarios
                 const payload = {
+                    name: "admin",
+                    email: "ruiz.toni.mrm@gmail.com",
+                    phone: "693408386",
+                    course: "admin",
                     date,
                     hour,
-                    shift,
                 };
 
                 const response = await fetch('/reserve', {
